@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Our simple HTTP server</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <script>
+  const handleResponse = async (response, parseResponse) => {
+      const content = document.querySelector('#content');
+
+      switch(response.status) {
+        case 200: 
+          content.innerHTML = `<b>Success</b>`;
+          break;
+        case 201:
+          content.innerHTML = `<b>Created</b>`;
+          break;
+        case 400: 
+          content.innerHTML = `<b>Bad Request</b>`;
+          break;
+        case 404:
+          content.innerHTML = `<b>Resource Not Found</b>`;
+          break;
+        default: 
+          content.innerHTML = `Error code not implemented by client.`;
+          break;
+      }
+
+      if(parseResponse) {
+        let obj = await response.json();
+        
+        //List out json responses in content
+
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            for (let item in key) {
+              if (key.hasOwnProperty(item)) {
+                  content.innerHTML +=`<h6>${item.name} ${item.email}</h6><br><p>${item.message}</p><br><br>`;
+              }
+            }
+          }
+        }
+        
+
+        /* for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            content.innerHTML +=`<h6>${key.name} ${key.email}</h6><br><p>${key.message}</p><br><br>`;
+        }
+        } */
+        //let jsonString = JSON.stringify(obj);
+        //content.innerHTML += `<p>${jsonString}</p>`;
+      } else {
+        content.innerHTML += '<p>Meta Data Received</p>';
+      }
+    };
+
+    //requestUpdate calls the server with a get or head request
+    const requestUpdate = async (userForm) => {
+      //retrieves action url from the form
+      //temporarily using get only for now
+      const url = userForm.querySelector('#urlField').value;
+      const method = 'get';
+    
+      //Call the server and collect a response
+      let response = await fetch(url, {
+        method,
+        headers: {
+            'Accept': 'application/json'
+        },
+      });
+
+      //Send server response to handleResponse
+      handleResponse(response, method === 'get');
+    };
+
+    //Init called when window loads. Declares feedbackForm and adds an event listener for the submit button
+    const init = () => {
+      const feedbackForm = document.querySelector('#feedbackForm');
+
+      //getFeedback method (calls requestUpdate and prevents default submission)
+      const getFeedback = (e) => {
+        e.preventDefault();
+        requestUpdate(feedbackForm);
+        return false;
+      }
+      
+      //Event Listener
+      feedbackForm.addEventListener('submit', getFeedback);
+    };
+
+    window.onload = init;
+  </script>
+  <!--<script type="module" src="../src/navbar.js"></script>-->
+</head>
+<body>
+
+  <!--<tl-navbar page=2></tl-navbar>-->
+
+  <section id="top">
+    <h3>Review User Feedback</h3>
+    <form id="feedbackForm" action="/getUsers" method="get">
+      <label for="type">Select Feedback Type:</label>
+      <select id='urlField' name="type">
+        <option value='/getAll'>All</option>
+        <option value='/getQuestions'>Questions</option>
+        <option value='/getComments'>Comments</option>
+        <option value='/getComplaints'>Complaints</option>
+      </select>
+      <input type="submit" value="View Feedback" />
+    </form>
+  </section>
+  <section id="content">
+  </section>
+</body>
+</html>

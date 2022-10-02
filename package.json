@@ -1,5 +1,5 @@
 {
-  "name": "http-api-2",
+  "name": "project-1-tl",
   "version": "1.0.0",
   "engines": {
     "node": "14.15.4",
@@ -13,14 +13,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tml1957/http-api-assignment-ii.git"
+    "url": "git+https://github.com/tml1957/430project1.git"
   },
   "author": "Thomas M Leonard",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tml1957/http-api-assignment-ii/issues"
-  },
-  "homepage": "https://github.com/tml1957/http-api-assignment-ii#readme",
   "devDependencies": {
     "eslint": "^8.24.0",
     "eslint-config-airbnb": "^19.0.4",

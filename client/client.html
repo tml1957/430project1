@@ -34,46 +34,20 @@
       }
     };
 
-    const handleResponse2 = async (response, parseResponse) => {
-      const content = document.querySelector('#content');
-
-      switch(response.status) {
-        case 200: 
-          content.innerHTML = `<b>Success</b>`;
-          break;
-        case 201:
-          content.innerHTML = `<b>Created</b>`;
-          break;
-        case 400: 
-          content.innerHTML = `<b>Bad Request</b>`;
-          break;
-        case 404:
-          content.innerHTML = `<b>Resource Not Found</b>`;
-          break;
-        default: 
-          content.innerHTML = `Error code not implemented by client.`;
-          break;
-      }
-
-      if(parseResponse) {
-        let obj = await response.json();
-        
-        let jsonString = JSON.stringify(obj);
-        content.innerHTML += `<p>${jsonString}</p>`;
-      } else {
-        content.innerHTML += '<p>Meta Data Received</p>';
-      }
-    };
-
+    //sendPost sends the form data to the server and handles the response it throws back
     const sendPost = async (nameForm) => {
-      const nameAction = nameForm.getAttribute('action');
+      //get the action and method types
+      const nameAction = nameForm.querySelector('#feedbackTypeSelect').value;
       const nameMethod = nameForm.getAttribute('method');
       
+      //retrieve data from the form and create formData in order to pass it to the server
       const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
+      const emailField = nameForm.querySelector('#emailField');
+      const messageField = nameForm.querySelector('#messageField');
 
-      const formData = `name=${nameField.value}&age=${ageField.value}`;
+      const formData = `name=${nameField.value}&email=${emailField.value}&message=${messageField.value}`;
 
+      //Send data to the server and collect a response
       let response = await fetch(nameAction, {
         method: nameMethod,
         headers: {
@@ -83,66 +57,59 @@
         body: formData,
       });
 
+      //Send response json to handleResponse
       handleResponse(response);
     };
 
-    const requestUpdate = async (userForm) => {
-      const url = userForm.querySelector('#urlField').value;
-      const method = userForm.querySelector('#methodSelect').value;
-    
-      let response = await fetch(url, {
-        method,
-        headers: {
-            'Accept': 'application/json'
-        },
-      });
-
-      handleResponse2(response, method === 'get');
-    };
-
+    //Init called when window loads. Declares nameForm and adds an event listener for the submit button
     const init = () => {
       const nameForm = document.querySelector('#nameForm');
-      const userForm = document.querySelector('#userForm');
 
-      const addUser = (e) => {
+      //addFeedback method (calls sendPost and prevents default submission)
+      const addFeedback = (e) => {
         e.preventDefault();
         sendPost(nameForm);
         return false;
       }
-      
-      const getUsers = (e) => {
-        e.preventDefault();
-        requestUpdate(userForm);
-        return false;
-      }
-      
-      nameForm.addEventListener('submit', addUser);
-      userForm.addEventListener('submit', getUsers);
+
+      //Event listener
+      nameForm.addEventListener('submit', addFeedback);
     };
 
     window.onload = init;
   </script>
+  <!--<script type="module" src="../src/navbar.js"></script>-->
 </head>
 <body>
+
+  <!--<tl-navbar page=1></tl-navbar>-->
+
   <section id="top">
-    <h3>POST Status Code Tests</h3>
+    <h3>Feedback Submission Form</h3>
     <form id="nameForm" action="/addUser" method="post">
       <label for="name">Name: </label>
+      <br>
       <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <input type="submit" value="Add User" />
-    </form>
-    <form id="userForm" action="/getUsers" method="get">
-      <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
+      <br><br>
+      <label for="email">Contact Email: </label>
+      <br>
+      <input id="emailField" type="text" name="email" />
+      <br><br>
+      <label for="type">Feedback Type</label>
+      <br>
+      <select id="feedbackTypeSelect" name="type">
+        <option value="/addQuestion">Question</option>
+        <option value="/addComment">Comment</option>
+        <option value="/addComplaint">Complaint</option>
       </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get User" />
+      <br><br>
+      <label for="message">Message</label>
+      <br>
+      <textarea id="messageField" name="message" rows="4" cols="50">
+        Please enter your feedback here.
+      </textarea>
+      <br><br>
+      <input type="submit" value="Submit Feedback" />
     </form>
   </section>
   <section id="content">
