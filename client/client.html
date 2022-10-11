@@ -3,7 +3,6 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
   <script>
   const handleResponse = async (response) => {
       
@@ -11,16 +10,19 @@
 
       switch(response.status) {
         case 200: //success
-          content.innerHTML = `<b>Success</b>`;
+          content.innerHTML = `<b>Successful Submission</b>`;
           break;
         case 201: //created
-          content.innerHTML = '<b>Created</b>';
+          content.innerHTML = '<b>Created Feedback</b>';
           break;
         case 204: //updated (no response back from server)
-          content.innerHTML = '<b>Updated (No Content)</b>';
+          content.innerHTML = '<b>Updated Feedback</b>';
           return;
         case 400: //bad request
-          content.innerHTML = `<b>Bad Request</b>`;
+          content.innerHTML = `<b>Can't Submit</b>`;
+          break;
+        case 404: //not found
+          content.innerHTML = `<b>Error Not Found</b>`;
           break;
         default: //any other status code
           content.innerHTML = `Error code not implemented by client.`;
@@ -37,18 +39,18 @@
     //sendPost sends the form data to the server and handles the response it throws back
     const sendPost = async (nameForm) => {
       //get the action and method types
-      const nameAction = nameForm.querySelector('#feedbackTypeSelect').value;
       const nameMethod = nameForm.getAttribute('method');
       
       //retrieve data from the form and create formData in order to pass it to the server
       const nameField = nameForm.querySelector('#nameField');
       const emailField = nameForm.querySelector('#emailField');
+      const type = nameForm.querySelector('#feedbackTypeSelect').value;
       const messageField = nameForm.querySelector('#messageField');
 
-      const formData = `name=${nameField.value}&email=${emailField.value}&message=${messageField.value}`;
+      const formData = `name=${nameField.value}&email=${emailField.value}&type=${type}&message=${messageField.value}`;
 
       //Send data to the server and collect a response
-      let response = await fetch(nameAction, {
+      let response = await fetch('/addAll', {
         method: nameMethod,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -74,42 +76,71 @@
 
       //Event listener
       nameForm.addEventListener('submit', addFeedback);
+
+      //setup navbar burger menu
+      const burgerIcon = document.querySelector("#burger");
+      const navbarMenu = document.querySelector("#nav-links");
+
+      burgerIcon.addEventListener('click', () => {
+          navbarMenu.classList.toggle('is-active');
+      });
     };
 
     window.onload = init;
   </script>
-  <!--<script type="module" src="../src/navbar.js"></script>-->
 </head>
 <body>
 
-  <!--<tl-navbar page=1></tl-navbar>-->
+  <nav class="navbar is-white has-shadow has-background-primary has-shadow">
+    <!-- logo / brand -->
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+      </a>
+      <a class="navbar-burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
+  
+    <div class="navbar-menu" id="nav-links">
+      <!-- right links -->
+      <div class="navbar-start">
+      <a class="navbar-item is-hoverable" href="/">
+          Submit
+        </a>
+      
+        <a class="navbar-item is-hoverable" href="/page2">
+          Review
+        </a>
+      </div> <!-- end navbar-start -->
+    </div>
+  </nav>
 
   <section id="top">
-    <h3>Feedback Submission Form</h3>
-    <form id="nameForm" action="/addUser" method="post">
+    <h1>Feedback Submission Form</h1>
+    <form class="form" id="nameForm" action="/addUser" method="post">
       <label for="name">Name: </label>
       <br>
-      <input id="nameField" type="text" name="name" />
+      <input id="nameField" type="text" class="input" name="name" />
       <br><br>
       <label for="email">Contact Email: </label>
       <br>
-      <input id="emailField" type="text" name="email" />
+      <input id="emailField" type="text" class="input" name="email" />
       <br><br>
       <label for="type">Feedback Type</label>
       <br>
-      <select id="feedbackTypeSelect" name="type">
-        <option value="/addQuestion">Question</option>
-        <option value="/addComment">Comment</option>
-        <option value="/addComplaint">Complaint</option>
+      <select id="feedbackTypeSelect" class="select" name="type">
+        <option value="question">Question</option>
+        <option value="comment">Comment</option>
+        <option value="complaint">Complaint</option>
       </select>
       <br><br>
       <label for="message">Message</label>
       <br>
-      <textarea id="messageField" name="message" rows="4" cols="50">
-        Please enter your feedback here.
-      </textarea>
+      <textarea id="messageField" name="message" class="textarea" placeholder="Please enter your feedback here." rows="4" cols="50"></textarea>
       <br><br>
-      <input type="submit" value="Submit Feedback" />
+      <input class="button" type="submit" value="Submit Feedback" />
     </form>
   </section>
   <section id="content">

@@ -9,10 +9,10 @@
 
       switch(response.status) {
         case 200: 
-          content.innerHTML = `<b>Success</b>`;
+          content.innerHTML = `<b>User Feedback</b>`;
           break;
         case 201:
-          content.innerHTML = `<b>Created</b>`;
+          content.innerHTML = `<b>User Feedback</b>`;
           break;
         case 400: 
           content.innerHTML = `<b>Bad Request</b>`;
@@ -29,23 +29,31 @@
         let obj = await response.json();
         
         //List out json responses in content
+     
+        Object.keys(obj).forEach(function(key) {
+            console.log(key, obj[key]);
 
-        for (let key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            for (let item in key) {
-              if (key.hasOwnProperty(item)) {
-                  content.innerHTML +=`<h6>${item.name} ${item.email}</h6><br><p>${item.message}</p><br><br>`;
-              }
-            }
-          }
-        }
-        
+            //Card HTML example used here. taken from bulma documentation.
+            content.innerHTML +=
+            `<div class="card">
+              <header class="card-header">
+                <p class="card-header-title">
+                  ${obj[key].name} : ${obj[key].email}
+                </p>
+                <button class="card-header-icon" aria-label="more options">
+                  <span class="icon">
+                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  ${obj[key].message}
+                </div>
+              </div>
+            </div>`;
+        });
 
-        /* for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            content.innerHTML +=`<h6>${key.name} ${key.email}</h6><br><p>${key.message}</p><br><br>`;
-        }
-        } */
         //let jsonString = JSON.stringify(obj);
         //content.innerHTML += `<p>${jsonString}</p>`;
       } else {
@@ -57,7 +65,8 @@
     const requestUpdate = async (userForm) => {
       //retrieves action url from the form
       //temporarily using get only for now
-      const url = userForm.querySelector('#urlField').value;
+      const type = document.querySelector('#urlField').value;
+      const url = `/getAll?type=${type}`;
       const method = 'get';
     
       //Call the server and collect a response
@@ -85,27 +94,58 @@
       
       //Event Listener
       feedbackForm.addEventListener('submit', getFeedback);
+
+      //setup navbar burger menu
+      const burgerIcon = document.querySelector("#burger");
+      const navbarMenu = document.querySelector("#nav-links");
+
+      burgerIcon.addEventListener('click', () => {
+          navbarMenu.classList.toggle('is-active');
+      });
     };
 
     window.onload = init;
   </script>
-  <!--<script type="module" src="../src/navbar.js"></script>-->
 </head>
 <body>
 
-  <!--<tl-navbar page=2></tl-navbar>-->
+  <nav class="navbar is-white has-shadow has-background-primary has-shadow">
+    <!-- logo / brand -->
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+      </a>
+      <a class="navbar-burger" id="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
+  
+    <div class="navbar-menu" id="nav-links">
+      <!-- right links -->
+      <div class="navbar-start">
+      <a class="navbar-item is-hoverable" href="/">
+          Submit
+        </a>
+      
+        <a class="navbar-item is-hoverable" href="/page2">
+          Review
+        </a>
+      </div> <!-- end navbar-start -->
+    </div>
+  </nav>
 
   <section id="top">
-    <h3>Review User Feedback</h3>
+    <h1>Review User Feedback</h1>
     <form id="feedbackForm" action="/getUsers" method="get">
       <label for="type">Select Feedback Type:</label>
-      <select id='urlField' name="type">
-        <option value='/getAll'>All</option>
-        <option value='/getQuestions'>Questions</option>
-        <option value='/getComments'>Comments</option>
-        <option value='/getComplaints'>Complaints</option>
+      <select id='urlField' class="select" name="type">
+        <option value='all'>All</option>
+        <option value='questions'>Questions</option>
+        <option value='comments'>Comments</option>
+        <option value='complaints'>Complaints</option>
       </select>
-      <input type="submit" value="View Feedback" />
+      <input type="submit" class="button" value="View Feedback" />
     </form>
   </section>
   <section id="content">
