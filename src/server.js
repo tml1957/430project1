@@ -85,7 +85,7 @@ const onRequest = (request, response) => {
       return handlePost(request, response, parsedUrl);
     }
     //Handles query params
-    if (request.method === 'GET') {
+    if (request.method === 'GET' || request.method === 'HEAD') {
       if (parsedUrl.pathname === '/getAll') {
         //get the query parameter from the link
         const bodyParams = parsedUrl.path.slice(parsedUrl.pathname.length + 1);
