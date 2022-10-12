@@ -85,17 +85,20 @@ const onRequest = (request, response) => {
       return handlePost(request, response, parsedUrl);
     }
     //Handles query params
-    if (parsedUrl.pathname === '/getAll') {
-      //get the query parameter from the link
-      const bodyParams = parsedUrl.path.slice(parsedUrl.pathname.length + 1);
+    if (request.method === 'GET') {
+      if (parsedUrl.pathname === '/getAll') {
+        //get the query parameter from the link
+        const bodyParams = parsedUrl.path.slice(parsedUrl.pathname.length + 1);
 
-      //create a body with key/val to pass into the handler
-      const body = {};
-      const [key, value] = bodyParams.split('=');
-      body[key] = value;
-  
-      return urlStruct[request.method][parsedUrl.pathname](request, response, body);
-    };
+        //create a body with key/val to pass into the handler
+        const body = {};
+        const [key, value] = bodyParams.split('=');
+        body[key] = value;
+    
+        return urlStruct[request.method][parsedUrl.pathname](request, response, body);
+      }
+      return urlStruct[request.method][parsedUrl.pathname](request, response);
+    }
   } else {
     return urlStruct[request.method].notFound(request, response);
   }
